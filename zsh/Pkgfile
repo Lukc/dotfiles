@@ -1,0 +1,15 @@
+# Description: zsh configuration files
+# Maintainer:  Luka Vandervelden <lukc@upyum.com>
+
+name=zsh-config
+version=0.1
+release=1
+source=(zsh/*.zsh zshrc)
+
+build() {
+    mkdir -p $PKG/etc/zsh
+	for i in *.zsh; do
+		install -m644 $i $PKG/etc/zsh/$i
+	done
+	install -m644 zshrc $PKG/etc/zsh/zshrc
+}
