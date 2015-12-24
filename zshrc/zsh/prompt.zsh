@@ -33,11 +33,7 @@ function precmd {
 			base_color=green ;;
 	esac
 
-	if [[ -n "$POWERLINE" && "$POWERLINE" != false ]]; then
-		sign="▶"
-	else
-		sign=">"
-	fi
+	sign=">"
 
 	case ${USER%%.*} in
 		root)
