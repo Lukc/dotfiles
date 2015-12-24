@@ -1,0 +1,19 @@
+# Maintainer: Luka Vandervelden <lukc@upyum.com>
+# Description: tmux powerline-like helper.
+# Depends on: tmux
+
+name=tmux-powerline
+version=git
+source=()
+release=1
+
+build() {
+	git clone https://github.com/erikw/tmux-powerline
+
+	cd tmux-powerline
+
+	mkdir -p "$PKG/usrshare/tmux-powerline"
+
+	cp -r *.sh config lib segments themes "$PKG/usr/share/tmux-powerline"
+}
+
