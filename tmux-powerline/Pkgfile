@@ -12,8 +12,8 @@ build() {
 
 	cd tmux-powerline
 
-	mkdir -p "$PKG/usrshare/tmux-powerline"
+	mkdir -p "$PKG/usr/share/tmux-powerline"
 
-	cp -r *.sh config lib segments themes "$PKG/usr/share/tmux-powerline"
+	cp -r *.sh config lib segments themes "$PKG/usr/share/tmux-powerline/"
 }
 
