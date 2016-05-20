@@ -25,8 +25,12 @@ function precmd {
 			base_color=magenta ;;
 		[Ss]overeign)
 			base_color=blue ;;
-		Akira|nemo)
+		[Aa]kira)
 			base_color=yellow ;;
+		[Nn]emo)
+			base_color=yellow ;;
+		[Rr]umia)
+			base_color=orange ;;
 		natsu)
 			base_color=cyan ;;
 		*)

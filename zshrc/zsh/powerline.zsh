@@ -12,6 +12,7 @@ function add_block {
 # Helper to convert color strings into usable color numbers.
 # Well… many many colors are missing, but, what the hell? As long as we’re
 # not using them, …
+# FIXME: Need something more declarative, here.
 function color {
 	case "$1" in
 		black)
@@ -40,6 +41,10 @@ function color {
 			echo "220";;
 		bright-yellow)
 			echo "227";;
+		orange)
+			echo "166";;
+		bright-orange)
+			echo "209";;
 		blue)
 			echo "69";;
 		bright-blue)
