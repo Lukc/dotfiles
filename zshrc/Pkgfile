@@ -2,9 +2,9 @@
 # Maintainer:  Luka Vandervelden <lukc@upyum.com>
 
 name=zshrc
-version=0.1
+version=0.2
 release=1
-source=(zsh/*.zsh zshrc)
+source=(zsh/*.zsh zsh/zshrc)
 
 build() {
     mkdir -p $PKG/etc/zsh

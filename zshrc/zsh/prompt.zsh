@@ -4,6 +4,8 @@ PS2="%{$fg_no_bold[yellow]%}%_>%{${reset_color}%} "
 PS3="%{$fg_no_bold[yellow]%}?#%{${reset_color}%} "
 
 function precmd {
+	r=$?
+
 	local path_color user_color host_color return_code user_at_host
 	local cwd sign branch vcs diff remote deco branch_color
 	local base_color
@@ -56,7 +58,8 @@ function precmd {
 
 	chroot_info=
 	if [[ -e /etc/chroot ]]; then
-		chroot_info="%{${fg_bold[white]}%} [$(< /etc/chroot)]"
+		chroot_color="${host_color:-$base_color}"
+		chroot_info="%{${fg_bold[white]}%}(${chroot_color}$(< /etc/chroot)%{${fg_bold[white]}%})"
 	fi
 
 	return_code="%(?..${deco}-%{${fg_no_bold[red]}%}%?${deco}- )"
@@ -65,7 +68,7 @@ function precmd {
 	cwd="%{${path_color}%}%48<...<%~"
 
 	PS1="$(powerline)${return_code}${user_at_host}"
-	PS1="$PS1 ${cwd}${chroot_info} ${sign}%{${reset_color}%} "
+	PS1="${chroot_info:+$chroot_info }$PS1 ${cwd} ${sign}%{${reset_color}%} "
 
 	# Right prompt with VCS info
 	if [[ -e .git ]]; then
@@ -91,6 +94,23 @@ function precmd {
 	else
 		RPS1=""
 	fi
+
+	RPS1="$RPS1%{${reset_color}%}"
 }
+
+function zle-line-init zle-keymap-select {
+	CMD_PROMPT="%{$(b orange)$(fb darkest-red)%} CMD %{${reset_color}%}"
+	INS_PROMPT="%{$(b brightest-green)$(fb darkest-green)%} INS %{${reset_color}%}"
+
+	precmd
+
+	RPS1="${RPS1:+$RPS1 }${${KEYMAP/vicmd/$CMD_PROMPT}/(main|viins)/$INS_PROMPT}"
+	zle reset-prompt
+}
+
+
+zle -N zle-line-init
+zle -N zle-keymap-select
+#zle -N reset-prompt
 
 # vim: set ts=4 sw=4 cc=80 :

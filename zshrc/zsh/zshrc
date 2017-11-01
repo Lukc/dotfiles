@@ -1,9 +1,17 @@
 # Env vars
-export PATH="$HOME/.local/bin:/sbin:/usr/sbin:$PATH:/usr/local/bin:/usr/local/sbin"
-export PAGER="less"
+
+if which vimpager >& /dev/null; then
+	export PAGER="vimpager -u $HOME/.vim/vimrc"
+else
+	export PAGER="less"
+fi
 export EDITOR="vim"
 export LESS="-I -M -R --shift 5"
 export LANG=en_US.UTF-8
+
+# FIXME: missing functions: add-prefix, remove-prefix, update-prefixes.
+#        Prefixes management is a pain right now.
+export PATH="$HOME/.local/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin:$PATH"
 export LD_LIBRARY_PATH="/usr/local/lib:$HOME/.local/lib"
 
 # Fuck tmux.
@@ -11,8 +19,11 @@ if [[ "$TERM" == screen ]]; then
 	export TERM=screen-256color
 fi
 
-# Used for powerline-things. Set to false if you don’t want that.
-: ${POWERLINE:=true}
+# Used for powerline-like-things. Set to false if you don’t want that.
+: ${POWERLINE:=false}
+
+# Escape key timeout. Increase if you have to work through lag.
+export KEYTIMEOUT=1
 
 # History settings
 HISTFILE=~/.histfile
@@ -68,6 +79,20 @@ compinit
 # vi keybindings
 bindkey -v
 
+bindkey -a 'gg' beginning-of-buffer-or-history
+bindkey -a 'g~' vi-oper-swap-case
+bindkey -a G end-of-buffer-or-history
+
+bindkey '^?' backward-delete-char
+bindkey '^H' backward-delete-char
+
+# Ctrl + (Left|Right)
+bindkey "^[[1;5C" forward-word 
+bindkey "^[[1;5D" backward-word
+
+# Alt + .
+bindkey "^[." insert-last-word
+
 # URxvt keys
 bindkey '[2~' overwrite-mode
 bindkey '[3~' delete-char
@@ -75,7 +100,7 @@ bindkey '[5~' history-search-backward
 bindkey '[6~' history-search-forward
 bindkey '[7~'	beginning-of-line
 bindkey '[8~'	end-of-line
-bindkey '^r'		history-incremental-search-backward
+bindkey '^r'	history-incremental-search-backward
 # Gnome Terminal
 bindkey 'OH'	beginning-of-line
 bindkey 'OF'	end-of-line
@@ -100,6 +125,15 @@ bindkey '^xe' edit-command-line
 
 # Complete help
 bindkey '^xc' _complete_help
+
+function backward-kill-arg {
+	local WORDCHARS="${WORDCHARS:s#[[:space:]]#}"
+	zle backward-kill-word
+}
+zle -N backward-kill-arg
+
+# Alt-backspace
+bindkey '^[^?' backward-kill-arg
 
 # () [] {} ...
 # This one did me more harm than good.
@@ -130,7 +164,10 @@ rationalise-dot() {
 zle -N rationalise-dot
 bindkey . rationalise-dot
 
-# $ 3+5 -> 8
+# Quick arithmetics
+if alias -m "$" | grep -q ""; then
+	unalias "$"
+fi
 $ () {
 	typeset -a input
 	input=(${@//×/*})
@@ -140,6 +177,7 @@ $ () {
 
 	echo $((${input[@]}))
 }
+alias "$"="noglob $"
 
 # Pattern-matching mv
 autoload zmv
