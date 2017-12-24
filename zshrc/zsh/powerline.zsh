@@ -19,6 +19,8 @@ function color {
 			echo "16";;
 		white)
 			echo "253";;
+		gr[ae]y)
+			echo "240";;
 		dark-gr[ae]y)
 			echo "236";;
 		light-gr[ae]y)
@@ -29,6 +31,8 @@ function color {
 			echo "160";;
 		bright-red)
 			echo "196";;
+		pink)
+			echo "199";;
 		cyan)
 			echo "45";;
 		bright-cyan)
@@ -57,6 +61,8 @@ function color {
 			echo "69";;
 		bright-blue)
 			echo "75";;
+		darkest-magenta)
+			echo "57";;
 		magenta)
 			echo "141";;
 		bright-magenta)
@@ -74,10 +80,11 @@ function fb { echo -e "\033[1m\033[38;5;$(color ${1})m" }
 function print_blocks {
 	local index=1
 	local background
+	local f b text
 	for f b text in ${blocks[@]}; do
 		((index += 3))
 
-		if [[ -n "${blocks[$((index + 1))]}" ]]; then
+		if [[ -v blocks[$((index + 1))] ]]; then
 			background="${blocks[$((index + 1))]}"
 		else
 			background=""

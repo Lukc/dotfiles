@@ -1,8 +1,8 @@
 
 # Display the title. Contains the command if given in $1
 function title {
-	t="zsh"
-	[[ -n "$1" ]] && t="${1//\%/\%\%}"
+	local t="zsh"
+	[[ -v 1 ]] && t="${1//\%/\%\%}"
 
 	case $TERM in
 		screen|screen-256color)

@@ -1,13 +1,16 @@
 
+# Removes the empty space at the right of the right prompt.
+ZLE_RPROMPT_INDENT=0
+
 # Others prompts
 PS2="%{$fg_no_bold[yellow]%}%_>%{${reset_color}%} "
 PS3="%{$fg_no_bold[yellow]%}?#%{${reset_color}%} "
 
 function precmd {
-	r=$?
+	local r=$?
 
 	local path_color user_color host_color return_code user_at_host
-	local cwd sign branch vcs diff remote deco branch_color
+	local cwd sign branch vcs vcs_color diff remote deco branch_color chroot_info
 	local base_color
 
 	title
@@ -71,26 +74,26 @@ function precmd {
 	PS1="${chroot_info:+$chroot_info }$PS1 ${cwd} ${sign}%{${reset_color}%} "
 
 	# Right prompt with VCS info
-	if [[ -e .git ]]; then
+	if git rev-parse --show-toplevel &> /dev/null; then
 		vcs=git
 		branch=$(git branch | grep '\*' | cut -d " " -f 2)
 		diff="$( (( $(git diff | wc -l) != 0 )) && echo '*')"
-		vcs_color="${fg_bold[white]}"
-	elif [[ -e .hg ]]; then
+		vcs_color="$(b grey)$(fb white)"
+	elif hg root &> /dev/null; then
 		vcs=hg
 		branch=
 		vcs_color="${fg_bold[white]}"
 	fi
 
 	if [[ -n "$diff" ]]; then
-		branch_color="${fg_bold[yellow]}"
+		branch_color="$(b orange)$(fb black)"
 		diff=" ±"
 	else
-		branch_color="${fg_bold[white]}"
+		branch_color="$(b white)$(fb black)"
 	fi
 
 	if [[ -n "$vcs" ]]; then
-		RPS1="- %{${vcs_color}%}$vcs%{${reset_color}%}:%{$branch_color%}$branch$diff%{${reset_color}%} -"
+		RPS1="%{${vcs_color}%} $vcs %{${reset_color}$branch_color%} $branch$diff %{${reset_color}%}"
 	else
 		RPS1=""
 	fi
@@ -99,18 +102,49 @@ function precmd {
 }
 
 function zle-line-init zle-keymap-select {
-	CMD_PROMPT="%{$(b orange)$(fb darkest-red)%} CMD %{${reset_color}%}"
-	INS_PROMPT="%{$(b brightest-green)$(fb darkest-green)%} INS %{${reset_color}%}"
+	local MODE
+
+	case "$KEYMAP" in
+		vicmd)
+			MODE="NORMAL"
+			color="$(b orange)$(fb darkest-red)"
+		;;
+		main|viins)
+			case "$ZLE_STATE" in
+				"globalhistory overwrite")
+					MODE="REPLACE"
+					color="$(b red)$(fb white)"
+				;;
+				"globalhistory insert")
+					MODE="INSERT"
+					color="$(b brightest-green)$(fb darkest-green)"
+				;;
+				*)
+				;;
+			esac
+		;;
+		vivis)
+			MODE="VISUAL"
+			color="$(b magenta)$(fb darkest-magenta)"
+		;;
+		vivli)
+			MODE="V-LINE"
+			color="$(b magenta)$(fb darkest-magenta)"
+		;;
+		*)i
+			MODE="$KEYMAP" # Will be lowercase.
+			color="$(b pink)$(fb black)"
+		;;
+	esac
 
 	precmd
 
-	RPS1="${RPS1:+$RPS1 }${${KEYMAP/vicmd/$CMD_PROMPT}/(main|viins)/$INS_PROMPT}"
+	RPS1="${RPS1:+$RPS1}%{${color}%} ${MODE} %{${reset_color}%}"
+
 	zle reset-prompt
 }
 
-
 zle -N zle-line-init
 zle -N zle-keymap-select
-#zle -N reset-prompt
 
 # vim: set ts=4 sw=4 cc=80 :
